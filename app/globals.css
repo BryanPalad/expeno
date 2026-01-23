@@ -1,26 +1,38 @@
 @import "tailwindcss";
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Design tokens */
+@theme {
+  --color-surface: #fafafa;
+  --color-panel: #0f172a;
+
+  --color-brand: #3b82f6;
+  --color-brand-dark: #2563eb;
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+
+  --color-border-subtle: #334155;
+
+  /* NEW: input text color */
+  --color-input-text: #0f172a; /* dark blue */
+  --color-input-placeholder: #64748b;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+/* Default input styles */
+input,
+textarea {
+  color: var(--color-input-text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-input-placeholder);
 }
