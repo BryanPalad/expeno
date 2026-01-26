@@ -1,6 +1,29 @@
 "use client";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginFormValues } from "@/lib/validation/auth";
+import AuthInput from "@/components/auth/AuthInput";
+
 export default function LoginPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
+
+  const onSubmit = async (data: LoginFormValues) => {
+    console.log("Login data:", data);
+
+    // TEMP: mock auth
+    await new Promise((res) => setTimeout(res, 1000));
+
+    // later:
+    // - call API
+    // - handle errors
+    // - redirect to dashboard
+  };
+
   return (
     <>
       <header className="mb-8 sm:mb-10 text-center sm:text-left">
@@ -40,24 +63,28 @@ export default function LoginPage() {
         <div className="flex-1 h-px bg-slate-200" />
       </div>
 
-      <form className="space-y-4">
-        <input
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <AuthInput
           type="email"
           placeholder="Email address"
-          className="w-full rounded-full bg-white px-5 py-3 text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand"
+          registration={register("email")}
+          error={errors.email}
         />
 
-        <input
+        <AuthInput
           type="password"
           placeholder="Password"
-          className="w-full rounded-full bg-white px-5 py-3 text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand"
+          registration={register("password")}
+          error={errors.password}
+          showTogglePassword
         />
 
         <button
           type="submit"
-          className="w-full mt-2 rounded-full bg-slate-900 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition"
+          disabled={isSubmitting}
+          className="w-full mt-2 rounded-full bg-slate-900 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Sign in
+          {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
       </form>
 

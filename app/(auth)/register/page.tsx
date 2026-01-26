@@ -1,6 +1,31 @@
 "use client";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, type RegisterFormValues } from "@/lib/validation/auth";
+import AuthInput from "@/components/auth/AuthInput";
+
 export default function RegisterPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (data: RegisterFormValues) => {
+    console.log("Register data:", data);
+
+    // TEMP mock
+    await new Promise((res) => setTimeout(res, 1000));
+
+    // later:
+    // - call register API
+    // - auto-login
+    // - redirect to dashboard
+  };
+
   return (
     <>
       <header className="mb-8 sm:mb-10 text-center sm:text-left">
@@ -40,30 +65,36 @@ export default function RegisterPage() {
         <div className="flex-1 h-px bg-slate-200" />
       </div>
 
-      <form className="space-y-4">
-        <input
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <AuthInput
           type="email"
           placeholder="Email address"
-          className="w-full rounded-full bg-white px-5 py-3 text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand"
+          registration={register("email")}
+          error={errors.email}
         />
 
-        <input
+        <AuthInput
           type="password"
           placeholder="Password"
-          className="w-full rounded-full bg-white px-5 py-3 text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand"
+          registration={register("password")}
+          error={errors.password}
+          showTogglePassword
         />
 
-        <input
+        <AuthInput
           type="password"
           placeholder="Confirm password"
-          className="w-full rounded-full bg-white px-5 py-3 text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand"
+          registration={register("confirmPassword")}
+          error={errors.confirmPassword}
+          showTogglePassword
         />
 
         <button
           type="submit"
-          className="w-full mt-2 rounded-full bg-slate-900 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition"
+          disabled={isSubmitting}
+          className="w-full mt-2 rounded-full bg-slate-900 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Create account
+          {isSubmitting ? "Creating account..." : "Create account"}
         </button>
       </form>
 
