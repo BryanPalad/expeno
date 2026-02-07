@@ -4,8 +4,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, type RegisterFormValues } from "@/lib/validation/auth";
 import AuthInput from "@/components/auth/AuthInput";
+import { ApiError, authApi } from "@/lib/api";
+import { useRouter } from "next/dist/client/components/navigation";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -15,15 +19,18 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
-    console.log("Register data:", data);
-
-    // TEMP mock
-    await new Promise((res) => setTimeout(res, 1000));
-
-    // later:
-    // - call register API
-    // - auto-login
-    // - redirect to dashboard
+    try {
+      await authApi.register(data.email, data.password);
+      toast.success("Account created successfully!");
+      router.push("/dashboard");
+      router.refresh();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    }
   };
 
   return (
