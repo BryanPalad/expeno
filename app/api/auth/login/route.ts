@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { loginSchema } from "@/lib/validation/auth";
 import { ZodError } from "zod";
+import { cookies } from "next/headers";
+import { signJwt } from "@/lib/auth/jwt";
 
 export async function POST(req: Request) {
   try {
@@ -33,11 +35,18 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({
-      id: user.id,
-      email: user.email,
-      name: user.name,
+    const token = signJwt(user.id);
+
+    const cookieStore = await cookies();
+    cookieStore.set("token", token, {
+      httpOnly: true,
+      secure: false, // Set to false for development
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
+
+    return NextResponse.json({ success: true });
   } catch (error: unknown) {
     if (error instanceof ZodError) {
       return NextResponse.json({ errors: error.issues }, { status: 400 });

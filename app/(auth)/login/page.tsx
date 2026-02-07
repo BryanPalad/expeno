@@ -4,8 +4,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormValues } from "@/lib/validation/auth";
 import AuthInput from "@/components/auth/AuthInput";
+import { useRouter } from "next/navigation";
+import { authApi, ApiError } from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -13,15 +17,18 @@ export default function LoginPage() {
   } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
   const onSubmit = async (data: LoginFormValues) => {
-    console.log("Login data:", data);
-
-    // TEMP: mock auth
-    await new Promise((res) => setTimeout(res, 1000));
-
-    // later:
-    // - call API
-    // - handle errors
-    // - redirect to dashboard
+    try {
+      await authApi.login(data.email, data.password);
+      toast.success("Successfully logged in!");
+      router.push("/dashboard");
+      router.refresh();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    }
   };
 
   return (
